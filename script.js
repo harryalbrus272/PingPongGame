@@ -1,55 +1,109 @@
-var mid = window.innerWidth/2;
-var bar = document.getElementsByClassName('bar');
 var ball = document.getElementById('ball');
-var scorebox = document.querySelector('#score p');
-var mainDim=document.querySelector('main');
-var playDim = document.getElementById('playground');
-var scr = 0;
-var highScore = 0;
-const moveBy= 10;
-if(localStorage.getItem("highScore") == null){
-  localStorage.setItem("highScore",scr);
+var bar = document.getElementsByClassName('bar');
+var main = document.querySelector('main');
+var playground = document.getElementById('playground');
+var sd = document.querySelector('#score p');
+var score = 0;
+let gameOn = false;
+var movement;
+const upperBar = bar[0];
+const lowerBar = bar[1];
+let ballSpeedX = 2;
+let ballSpeedY = 2;
+const moveBy = 20;
+const barOffsetWidth = upperBar.offsetWidth;
+const barOffsetHeight = upperBar.offsetHeight;
+const ballDim = ball.offsetWidth;
+var hs = localStorage.getItem('highScore');
+
+function updateScore() {
+  sd.innerText = score;
+  if (hs == null) {
+    alert("You are the first one to play the game on your device");
+  }
 }
-localStorage.setItem("highScore",30);
-console.log(localStorage.getItem("highScore"));
+updateScore();
+
+function alignMiddle() {
+  upperBar.style.left = (window.innerWidth - barOffsetWidth) / 2 + "px";
+  lowerBar.style.left = (window.innerWidth - barOffsetWidth) / 2 + "px";
+  lowerBar.style.top = window.innerHeight - 15 + "px";
+  ball.style.left = (window.innerWidth - ballDim) / 2 + "px";
+  playground.style.height = lowerBar.getBoundingClientRect().top - upperBar.getBoundingClientRect().bottom + "px";
+}
+
+function exitCode(lever) {
+  if (movement != undefined) {
+    clearInterval(movement);
+    alert("Game ends with score" + score);
+  }
+  if (score > parseInt(hs)) {
+    localStorage.setItem('highScore', score);
+    hs = score;
+  }
+  gameOn = false;
+  score = 0;
+  if (lever == 2) {
+    ballSpeedY = 2;
+  } else if (lever == 1) {
+    ballSpeedY = -2;
+  }
+  alignMiddle();
+}
 alignMiddle();
 window.addEventListener('resize', alignMiddle);
-function updateScore(currscore){
-  scorebox.innerText=currscore;
-}
-updateScore(0);
-function barPosition(){
-  return bar[0].getBoundingClientRect();
-}
-function ballPosition(){
-  return ball.getBoundingClientRect();
-}
-function alignMiddle(){
-  playDim.style.width=window.innerWidth-6+"px";
-  playDim.style.height=mainDim.getBoundingClientRect().height-34 +"px";
-  mid = mainDim.getBoundingClientRect().width/2;
-  let local1 = ball.getBoundingClientRect().width/2;
-  let local2 = bar[0].getBoundingClientRect().width/2;
-  ball.style.left = (mainDim.getBoundingClientRect().width-6)/2 - local1 +"px";
-  bar[0].style.left = mid - local2 +"px";
-  bar[1].style.left = mid  - local2 +"px";
+window.addEventListener('keydown', function(event) {
+  let lft = upperBar.getBoundingClientRect();
+  let key = event.key;
+  if ((key == "d" || key == "D" || key == "ArrowRight") && lft.right <= window.innerWidth) {
+    let n = parseInt(lft.left) + moveBy + "px";
+    upperBar.style.left = n;
+    lowerBar.style.left = n;
+  } else if ((key == 'a' || key == 'A' || key == "ArrowLeft") && lft.left >= 0) {
+    let n = parseInt(lft.left) - moveBy + "px";
+    upperBar.style.left = n;
+    lowerBar.style.left = n;
+  } else if (key == 'Enter') {
+    if (!gameOn) {
+      gameOn = true;
+      let ballRect = ball.getBoundingClientRect();
+      let ballX = ballRect.x;
+      let ballY = ballRect.y;
+      movement = setInterval(function() {
+        console.log(ballX, ballY);
+        let rod1X = upperBar.getBoundingClientRect().x;
+        let rod2X = lowerBar.getBoundingClientRect().x;
+        console.log(ballSpeedY + "ballSpeedY");
+        ballX += ballSpeedX;
+        ballY += ballSpeedY;
+        ball.style.left = ballX + 'px';
+        ball.style.top = ballY + 'px';
+        if ((ballX + ballDim) > window.innerWidth || ballX < 0) {
+          ballSpeedX = -ballSpeedX;
+        }
+        let ballPos = ballX + ballDim / 2;
+        if ((ballY + ballDim) >= playground.offsetHeight - 2) {
+          ballSpeedY = -ballSpeedY;
 
-}
-function ballMoving(){
-  
-}
-window.addEventListener('keydown',function(event){
-  let key=event.key;
-  if ((key == "d" || key == "D" || key=="ArrowRight") && barPosition().right <= playDim.getBoundingClientRect().width) {
-    let n = parseInt(barPosition().left) + moveBy + "px";
-    bar[0].style.left = n;
-    bar[1].style.left = n;
-  }  else if ((key == 'a' || key == 'A' || key=="ArrowLeft") && barPosition().left >= 0) {
-    let n = parseInt(barPosition().left) - moveBy + "px";
-    bar[0].style.left = n;
-    bar[1].style.left = n;
-  } else if ( key == 'Enter') {
-    alert("Starting game");
-    ballMoving();
+          if ((ballPos < rod1X) || (ballPos > (rod1X + barOffsetWidth))) {
+            exitCode(1);
+          } else {
+            score++;
+            updateScore();
+          }
+
+        } else if (ballY <= (playground.getBoundingClientRect().top - playground.getBoundingClientRect().y)) {
+          ballSpeedY = -ballSpeedY;
+
+          if ((ballPos < rod2X) || (ballPos > (rod2X + barOffsetWidth))) {
+            exitCode(2);
+          } else {
+            score++;
+            updateScore();
+          }
+        }
+
+      }, 10);
+    }
   }
 });

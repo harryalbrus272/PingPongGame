@@ -3,7 +3,7 @@
   padding: 0;
 }
 body{
-  overflow: hidden;
+  overflow:hidden;
 }
 .bar {
   width:150px;
@@ -13,11 +13,10 @@ body{
 }
 .upper-bar{
   background: blue;
-  top:5px;;
+  top:70px;
 }
 .lower-bar{
   background: purple;
-  bottom:5px;
 }
 .heading{
   width:90vw;
@@ -26,6 +25,7 @@ body{
   background-color: red;
   position: absolute;
   top:0px;
+  left: 50%;
   width: 15px;
   height:15px;
   border-radius: 50%;
@@ -57,16 +57,13 @@ h2{
   word-spacing: 1.3rem;
 }
 main{
-  position: relative;
   height: 91vh;
-  width:100vw;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  width: 100vw;
+  margin: 0 auto;
 }
 #playground{
-  position: relative;
+  position: absolute;
+  top:78px;
+  width:100vw;
   margin: 0 auto;
-  border: 2px solid red;
 }
