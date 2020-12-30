@@ -51,7 +51,6 @@ function exitCode() {
   localStorage.setItem('rodName',lever);
   gameOn = false;
   score = 0;
-  updateScore();
   alignMiddle();
 }
 alignMiddle();
