@@ -16,12 +16,11 @@ const barOffsetHeight = upperBar.offsetHeight;
 const ballDim = ball.offsetWidth;
 var hs = localStorage.getItem('highScore');
 var lever = 1;
-
+if (hs == null) {
+  alert("You are the first one to play the game on your device");
+}
 function updateScore() {
   sd.innerText = score;
-  if (hs == null) {
-    alert("You are the first one to play the game on your device");
-  }
 }
 updateScore();
 
